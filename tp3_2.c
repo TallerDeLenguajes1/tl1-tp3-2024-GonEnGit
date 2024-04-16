@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     {
         for (int j = 0; j < COL; j++)
         {
-            aux = rand() + 40000; // solucioná los valores
+            aux = 10000 + rand() % 40000; // solucioná los valores
             produccion[i][j] = aux;
         }
     }
