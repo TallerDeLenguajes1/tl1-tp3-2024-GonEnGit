@@ -8,11 +8,17 @@ int main(int argc, char *argv[])
     char *buff;
     int cantidad;
 
-    //
-    buff = (char *) malloc(sizeof(char) * 100); // le das a buff un tamaño para 100 letras
-    char ** nombres = (char **)malloc(sizeof(char) * 5);    // reservo la memoria de las 5 filas
+    // reservas ... ?
+    buff = (char *) malloc(sizeof(char) * 100);               // le das a buff un tamaño para 100 letras
+    char ** nombres = (char **)malloc(sizeof(char *) * 5);    // reservo la memoria de las 5 filas
+    /*
+        (linea 13), CUIDADO, acá tenias un error grande, en un puntero doble
+        se reserva el tamaño de un puntero no de un tipo de variable
+        por eso usas '(char *) * 5' y no solo '(char) * 5'
+    */
 
-    printf("Ingrese 5 nombres: \n");
+
+    printf("\nIngrese 5 nombres: \n");
     for (int i = 0; i < 5; i++)
     {
         gets(buff);     // tomo un nombre en buff
@@ -21,12 +27,15 @@ int main(int argc, char *argv[])
         strcpy(nombres[i], buff);
     }
 
+    printf("\n");
     for (int i = 0; i < 5; i++)
     {
         printf("Nombre: %s\n", nombres[i]);
     }
-    
+    printf("\n");
+
     free(buff);     // no te comas los free
     free(nombres);
+
     return 0;
 }

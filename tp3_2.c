@@ -26,6 +26,7 @@ int main(int argc, char *argv[])
     }
 
     // muestro la matriz
+    printf("\n");
     for (int i = 0; i < FIL; i++)
     {
         for (int j = 0; j < COL; j++)
@@ -55,10 +56,12 @@ int main(int argc, char *argv[])
         printf("\nPromedio del a%co %d: %d", 164, i + 1, promedio);
         suma = 0;
     }
-    
-    // tratá de cambiar los for por funciones...
+
+    printf("\n");
     buscarMaximo(&produccion[0][0]);
+    printf("\n");
     buscarMinimo(&produccion[0][0]);
+    printf("\n\n");
 
     return 0;
 }
@@ -78,7 +81,7 @@ void buscarMaximo(int *pMatriz)
                 mes = j + 1;
             }
         }
-        printf("\nLa mayor producci%dn del a%co %d fue de %d en el mes %d", 162, 164, i + 1, mayor, mes);
+        printf("\nLa mayor producci%cn del a%co %d fue de %d en el mes %d", 162, 164, i + 1, mayor, mes);
         mayor = 0;
     }
 }
