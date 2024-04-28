@@ -19,11 +19,13 @@ typedef struct {
     producto *productos;       // depende de cantidadProductos (crear con memoria dinamica)
 }cliente;
 
+/* No trates de usar dobles en este */
 
 /* prototipos */
-void crearCliente(cliente *datos);
-void cargarProductos(producto *datos, int maximo);
-void mostrarClientes(cliente *datos, int total);
+void crearCliente(cliente *nuevoCliente);
+void cargarProductos(producto *nuevoProducto, int maximo);
+void mostrarClientes(cliente *entradaCliente, int total);
+float totalProductos(producto *datos);
 
 /* main */
 int main(int argc, char * argv[])
@@ -36,22 +38,24 @@ int main(int argc, char * argv[])
     // cuerpo
     while (cantClientes <= 0 || cantClientes >= 6)
     {
-        printf("Ingrese la cantidad de clientes a cargar: ");
+        printf("\nIngrese la cantidad de clientes a cargar: ");
         scanf("%d", &cantClientes);
-        if (0 <= cantClientes && cantClientes >= 6 )
+        if (0 <= cantClientes && cantClientes >= 6)
         {
             printf("Pruebe con una cantidad entre 1 y 5.\n");
         }
     }
-    // para poder mostrarlos despues podes crear un arreglo con la 
-    // asignacion de memoria así al final, podes liberar 'datos' 
+    // para poder mostrarlos despues, podes crear un arreglo con la 
+    // asignacion de memoria así al final, podes liberar 'listaClientes'
     // y eliminar toda la lista de la memoria
     cliente *listaClientes = (cliente *)malloc(sizeof(cliente) * cantClientes);
     for (int i = 0; i < cantClientes; i++)
     {
         crearCliente(&listaClientes[i]);
     }
+    printf("\n/--------- Ventas: ---------/\n");
     mostrarClientes(listaClientes, cantClientes);
+    printf("\n");
 
 //----------------------------------//
     free(listaClientes);
@@ -60,7 +64,7 @@ int main(int argc, char * argv[])
 }
 
 /* definiciones */
-void crearCliente(cliente *datos)
+void crearCliente(cliente *nuevoCliente)
 {
     int auxLetras;
     char *buffer = (char *)malloc(sizeof(char) * 100);
@@ -75,7 +79,7 @@ void crearCliente(cliente *datos)
     printf("Ingrese el nombre del cliente: ");
     fflush(stdin);
     gets(buffer);
-    // nombrCliente te lo dieron como puntero,
+    // nombreCliente te lo dieron como puntero,
     // asignas memoria y recien copias
     auxLetras = strlen(buffer);
     clienteTemp.nombreCliente = (char *)malloc((sizeof(char) * auxLetras) + 1);
@@ -87,61 +91,69 @@ void crearCliente(cliente *datos)
     clienteTemp.productos = (producto *)malloc(sizeof(producto) * clienteTemp.cantidadProductos);  // guardas memoria para la cantidad de productos
     cargarProductos(clienteTemp.productos, clienteTemp.cantidadProductos);
 
-    *datos = clienteTemp;
-    datos++;
+    // asignas los datos recien creado a un espacio en la lista
+    *nuevoCliente = clienteTemp;
+    // y moves la lista al siguiente espacio
+    nuevoCliente++;
 
     free(buffer);
 }
 
-void cargarProductos(producto *datos, int maximo)
+void cargarProductos(producto *nuevoProducto, int maximo)
 {
-    // creas un arreglo de ID para que coincidan en todos los clientes
-    int IDProductos[5], auxTipo, auxCantLetras;
-    for (int i = 0; i < 5; i++)
-    {
-        IDProductos[i] = 100 + rand() % 100;
-    }
-    char *TiposProductos[]={"Galletas", "Snack", "Cigarrillos", "Caramelos", "Bebidas"};
+    int auxTipo, auxCantLetras;
+    char *TiposProductos[]={"Galleta", "Snack", "Cigarrillo", "Caramelo", "Bebida"};
     producto productoTemp;
 
     for (int i = 0; i < maximo; i++)
     {
-        auxTipo = rand() % 5;
-        productoTemp.productoID = IDProductos[auxTipo];
+        productoTemp.productoID = 100 + rand() % 100;
         productoTemp.cantidad = 1 + rand() % 10;
 
         // asignas memoria para el tipo de producto
+        auxTipo = rand() % 5;
         auxCantLetras = strlen(TiposProductos[auxTipo]);
         productoTemp.tipoProducto = (char *)malloc((sizeof(char) * auxCantLetras) + 1);
         strcpy(productoTemp.tipoProducto,TiposProductos[auxTipo]);    // cuidad asignar con = te hace perder el puntero, quiz, te suena?
 
         productoTemp.precioUnitario = 10 + rand() % 90;
 
-        *datos = productoTemp;
-        datos++;
+        *nuevoProducto = productoTemp;
+        nuevoProducto++;
     }
 }
 
-void mostrarClientes(cliente *datos, int total)
+void mostrarClientes(cliente *entradaCliente, int total)
 {
     cliente clienteAMostrar;
     producto productoAMostrar;
 
     for (int indiceCli = 0; indiceCli < total; indiceCli++)
     {
-        clienteAMostrar = *datos;
+        float precioTotalPorProducto, precioTotalPorCliente = 0;    // como lo veas estas variables tienen nombres muy largos
+        clienteAMostrar = *entradaCliente;
 
-        printf("\n/--------- Ventas: --------- /\n");
-
-        printf("\nCliente: %s -- #%d\n", clienteAMostrar.nombreCliente, clienteAMostrar.clienteID);
-        printf("\n/--------Lista: --------/");
+        printf("\nCliente: %s -- ID: %d ---- Pedido: \n", clienteAMostrar.nombreCliente, clienteAMostrar.clienteID);
         for (int indiceProd = 0; indiceProd < clienteAMostrar.cantidadProductos; indiceProd++)
         {
             productoAMostrar = clienteAMostrar.productos[indiceProd];
-            printf("\nProducto: %s -- %d\n", productoAMostrar.tipoProducto, productoAMostrar.productoID);
+            printf("\nProducto: %s -- #%d\n", productoAMostrar.tipoProducto, productoAMostrar.productoID);
             printf("Cantidad: %d\n", productoAMostrar.cantidad);
             printf("Precio por unidad: %.2f$\n", productoAMostrar.precioUnitario);
+
+            precioTotalPorProducto = totalProductos(&productoAMostrar);
+            printf("\n~Total por %ss: $%.2f\n", productoAMostrar.tipoProducto, precioTotalPorProducto);
+
+            precioTotalPorCliente += precioTotalPorProducto;
         }
-        datos++;        // el puntero es datos no clienteAMostrar
+        printf("\n~~Total del cliente #%d: $%.2f\n", clienteAMostrar.clienteID, precioTotalPorCliente);
+        printf("\n/------------------------------/\n");
+
+        entradaCliente++;        // el puntero es datos no clienteAMostrar
     }
+}
+
+float totalProductos(producto *datos)
+{
+    return datos->cantidad * datos->precioUnitario;
 }
